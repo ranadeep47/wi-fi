@@ -17,18 +17,7 @@ http://linuxcommando.blogspot.in/2013/10/how-to-connect-to-wpawpa2-wifi-network.
 http://stackoverflow.com/questions/13230370/nodejs-child-process-write-to-stdin-from-an-already-initialised-process
 http://superuser.com/questions/615664/creating-wifi-access-point-on-a-single-interface-in-linux
 
-TODO : Node 0.12 has synchronous child processes and list its advantages and shit
-*/
-
-/*
-API
-
-wifi.iface('').connect('ssid-name',[passphrase])
-//Either NoAuth/WEP || WPA (wpa_passphrase ssid-name)
-/etc/wpa_supplicant , use >> or append to the file or youll delete and shit
-
-if using network-manager then /etc/NetworkManager/system-connections
-else wpa_supplcant.conf
+TODO : Node 0.12 has synchronous child processes and list its advantages and stuff
 */
 
 var cp 		= require('child_process'),
