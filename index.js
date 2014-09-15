@@ -14,7 +14,6 @@ http://w1.fi/hostapd/
 http://wireless.kernel.org/en/users/Documentation/hostapd
 
 http://linuxcommando.blogspot.in/2013/10/how-to-connect-to-wpawpa2-wifi-network.html
-http://stackoverflow.com/questions/13230370/nodejs-child-process-write-to-stdin-from-an-already-initialised-process
 http://superuser.com/questions/615664/creating-wifi-access-point-on-a-single-interface-in-linux
 
 TODO : Node 0.12 has synchronous child processes and list its advantages and stuff
