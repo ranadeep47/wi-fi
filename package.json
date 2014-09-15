@@ -1,0 +1,14 @@
+{
+  "name": "wi-fi",
+  "version": "0.0.0",
+  "description": "A small and simple wifi lib for node, works only on linux systems",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wifi"
+  ],
+  "author": "ranadeep47",
+  "license": "MIT"
+}
