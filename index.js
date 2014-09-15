@@ -29,12 +29,12 @@ module.exports = Wifi;
 
 //Utils
 var utils = require('./utils'),
-	update_dhclient 	  = utils.update_dhclient,
-	update_wpa_supplicant = utils.update_wpa_supplicant,
-	parse_ssid_list       = utils.parse_ssid_list,
-	parse_link_status 	  = utils.parse_link_status,
-	MAC_REGEX 			  = utils.MAC_REGEX,
-	WPA_SUPPLICANT 		  = utils.WPA_SUPPLICANT;
+	update_dhclient 		= utils.update_dhclient,
+	update_wpa_supplicant	= utils.update_wpa_supplicant,
+	parse_ssid_list 		= utils.parse_ssid_list,
+	parse_link_status		= utils.parse_link_status,
+	MAC_REGEX 				= utils.MAC_REGEX,
+	WPA_SUPPLICANT 			= utils.WPA_SUPPLICANT;
 
 function Wifi(options){
 	this.interface = options.interface || 'wlan0';
