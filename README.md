@@ -14,10 +14,10 @@ wifi.connect(ssid,passphrase,function(err,details){});
 
 //interface is optional for all the functions
 
-wifi.disconnect(function(err,disabled){}) //disabled is a boolean
+wifi.disconnect(function(err,disconnected){}) //disconnected is a boolean
 
 wifi.enable([interface],function(err,enabled){}) // enabled is a boolean
-wifi.disable([interface],function(err,disabled){}) // enabled is a boolean
+wifi.disable([interface],function(err,disabled){}) // disabled is a boolean
 
 wifi.status([interface],function(err,details){}) //
 
