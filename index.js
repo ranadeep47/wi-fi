@@ -22,7 +22,8 @@ TODO : Node 0.12 has synchronous child processes and list its advantages and stu
 var cp 		= require('child_process'),
 	exec 	= cp.exec,
 	spawn 	= cp.spawn,
-	fs 		= require('fs');
+	fs 		= require('fs'),
+	extend  = require('util')._extend;
 
 
 module.exports = Wifi;
@@ -37,6 +38,7 @@ var utils = require('./utils'),
 	WPA_SUPPLICANT 			= utils.WPA_SUPPLICANT;
 
 function Wifi(options){
+	var options = extend({}, options);
 	this.interface = options.interface || 'wlan0';
 	this.driver    = options.driver || 'wext';
 	this.current   = null;
