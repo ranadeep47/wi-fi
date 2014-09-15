@@ -1,6 +1,9 @@
 wi-fi
 =====
 
+Note : Before you test in a debian system run
+`sudo service network-manager stop`
+
 A simple node interface to linux(debian) wireless commands
 
 ```
