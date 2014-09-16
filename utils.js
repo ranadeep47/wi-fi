@@ -68,7 +68,16 @@ exports.update_wpa_supplicant = function(ssid,passphrase,cb){
 			}
 			
 		}
-		if(!update_needed) cb(null,true)
+		if(!update_needed) {
+			generate_supplicant(ssid,passphrase,function(err,network){
+				if(err){
+					cb(err,null)
+					return;
+				}
+				fs.appendFileSync(WPA_SUPPLICANT,network+'\n');
+				cb(null,true)
+			});
+		}
 	})
 }
 
