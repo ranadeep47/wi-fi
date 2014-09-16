@@ -65,6 +65,10 @@ exports.update_wpa_supplicant = function(ssid,passphrase,cb){
 						});
 					})(i);
 				}
+				else {
+					cb(null,true);
+					return;
+				}
 			}
 			
 		}
