@@ -193,8 +193,10 @@ Wifi.prototype.disconnect = function(cb){
 		if(err) {
 			if(err.message.search('no process found') > -1) {
 				exec('iw dev '+ctx.interface+ ' disconnect',function(err,sout,serr){
-					if(err) cb(serr,null);
-					else cb(null,true);
+					if(err) {
+						//TODO
+					}
+					cb(null,true);
 				})
 			}
 			else cb(serr,null);

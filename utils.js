@@ -30,7 +30,7 @@ exports.update_wpa_supplicant = function(ssid,passphrase,cb){
 
 	fs.readFile(WPA_SUPPLICANT,'utf8',function(err,contents){
 		//read file contents to memory
-		if(!contents) {
+		if(err || !contents) {
 			//create file and return
 			generate_supplicant(ssid,passphrase,function(err,network){
 				fs.appendFile(WPA_SUPPLICANT,network+'\n',function(err){
@@ -89,7 +89,8 @@ exports.update_wpa_supplicant = function(ssid,passphrase,cb){
 function generate_supplicant(ssid,passphrase,cb){
 	ssid = ssid.trim();
 	passphrase = passphrase.trim();
-	exec('wpa_passphrase '+ssid+' '+passphrase,function(err,sout,serr){
+	var cmd  = "wpa_passphrase"+" '"+ssid+"' '"+passphrase+"'";
+	exec(cmd,function(err,sout,serr){
 		if(err) cb(serr,null);
 		else cb(null,sout);
 	});
