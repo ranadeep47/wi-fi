@@ -238,4 +238,5 @@ Wifi.prototype.status = function(interface,cb){
 
 Wifi.prototype.hotspot = function(ssid,passphrase){
 		//Invote the ap-hotspot functionality
+		
 }
