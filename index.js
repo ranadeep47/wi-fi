@@ -37,6 +37,8 @@ var utils = require('./utils'),
 	MAC_REGEX 				= utils.MAC_REGEX,
 	WPA_SUPPLICANT 			= utils.WPA_SUPPLICANT;
 
+var hotspot = require('./hotspot');
+
 function Wifi(options){
 	var options = extend({}, options);
 	this.interface = options.interface || 'wlan0';
@@ -236,7 +238,8 @@ Wifi.prototype.status = function(interface,cb){
 	})
 }
 
-Wifi.prototype.hotspot = function(ssid,passphrase){
+Wifi.prototype.hotspot = function(ssid,passphrase,iface){
 		//Invote the ap-hotspot functionality
-		
+		if(!iface) iface = 'wlan0';
+		hotspot.start(ssid,passphrase,iface);
 }
