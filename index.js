@@ -130,24 +130,40 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 			if(!err & disconnected) {
 				update_wpa_supplicant(ssid,passphrase,function(err,updated){
 					if(!err && updated) {
-
-						out = fs.openSync('./out.log', 'a'),
+					//	var out = fs.openSync('./out.log','a');
 						ctx.current = spawn('wpa_supplicant'
-											,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,"-B"]
-											,{/*detached : true, */ stdio : ['ignore',out,out]}
-											); 
+											,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT]
+										//	,{stdio : ['ignore',out,'ignore']}
+											);
+
+						ctx.current.stdout.on('data',function(data){
+							console.log(data.toString('utf8'))
+						}) 
 						//To prevent the parent(node) to wait for wpa_supplicant to exit.
-						ctx.current.unref();
-						//Extract mac , run dhclient
-						update_dhclient(interface,function(err,updated){
-							if(!err && updated) {
-								ctx.status(interface,cb);
+						fs.close(out);
+						var sout = fs.createReadStream('./out.log')
+						sout.on('data',function(data){
+							console.log('Emitted')
+							fs.unlinkSync('./out.log')
+							if(isConnected(data.toString('utf8'))) {
+								//Extract mac , run dhclient
+								update_dhclient(interface,function(err,updated){
+									if(!err && updated) {
+										ctx.status(interface,cb);
+									}
+									else cb(err,null)
+								})
 							}
-							else cb(err,null)
+							else {
+								//TODO : Remove from wpa_supplicant
+								ctx.current.kill()
+								cb(new Error('Wrong passcode'))
+							}
+							ctx.current.unref();
 						})
 					}
 					else cb(err,null);
-				})
+					});
 			}
 			else cb(err,null)
 		})
@@ -238,8 +254,14 @@ Wifi.prototype.status = function(interface,cb){
 	})
 }
 
-Wifi.prototype.hotspot = function(ssid,passphrase,iface){
+Wifi.prototype.hotspot = function(ssid,passphrase,iface,cb){
 		//Invote the ap-hotspot functionality
 		if(!iface) iface = 'wlan0';
-		hotspot.start(ssid,passphrase,iface);
+		hotspot.start(ssid,passphrase,iface,cb);
+}
+
+
+function isConnected(str){
+	if(str.search('CTRL-EVENT-DISCONNECTED') > -1) return false;
+	else if (str.search('CTRL-EVENT-CONNECTED') > -1) return true;
 }
