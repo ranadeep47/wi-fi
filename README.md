@@ -4,6 +4,8 @@ wi-fi
 Note : Before you test in a debian system run
 `sudo service network-manager stop`
 
+To Test the functionality `node test/try.js`, after running dont forget to `pkill hostapd & ifconfig wlan0 up`
+
 A simple node interface to linux(debian) wireless commands
 
 ```

@@ -130,40 +130,35 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 			if(!err & disconnected) {
 				update_wpa_supplicant(ssid,passphrase,function(err,updated){
 					if(!err && updated) {
-					//	var out = fs.openSync('./out.log','a');
-						ctx.current = spawn('wpa_supplicant'
-											,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT]
-										//	,{stdio : ['ignore',out,'ignore']}
-											);
+						try{
+							fs.truncateSync('./out.log','');
+						} catch(e){
 
-						ctx.current.stdout.on('data',function(data){
-							console.log(data.toString('utf8'))
-						}) 
-						//To prevent the parent(node) to wait for wpa_supplicant to exit.
-						fs.close(out);
-						var sout = fs.createReadStream('./out.log')
-						sout.on('data',function(data){
-							console.log('Emitted')
-							fs.unlinkSync('./out.log')
-							if(isConnected(data.toString('utf8'))) {
-								//Extract mac , run dhclient
-								update_dhclient(interface,function(err,updated){
-									if(!err && updated) {
-										ctx.status(interface,cb);
-									}
-									else cb(err,null)
-								})
-							}
-							else {
-								//TODO : Remove from wpa_supplicant
-								ctx.current.kill()
-								cb(new Error('Wrong passcode'))
-							}
-							ctx.current.unref();
-						})
+						}
+						ctx.current = wpa_connect(ctx);
+						setTimeout(function(){
+							var stdoutlog = fs.readFileSync('./out.log','utf8');
+							if(isConnected(stdoutlog)) {
+									//run wpa_supplicant again
+									//Extract mac , run dhclient
+									update_dhclient(interface,function(err,updated){
+										if(!err && updated) {
+											ctx.status(interface,cb);
+										}
+										else cb(err,null)
+									})
+								}
+								else {
+									//TODO : Remove from wpa_supplicant
+									cb(new Error('Wrong passcode'))
+								}
+						},5000)
+						ctx.current.unref();
+
+
 					}
 					else cb(err,null);
-					});
+				});
 			}
 			else cb(err,null)
 		})
@@ -264,4 +259,12 @@ Wifi.prototype.hotspot = function(ssid,passphrase,iface,cb){
 function isConnected(str){
 	if(str.search('CTRL-EVENT-DISCONNECTED') > -1) return false;
 	else if (str.search('CTRL-EVENT-CONNECTED') > -1) return true;
+}
+
+function wpa_connect(ctx){
+	var child = spawn('wpa_supplicant'
+				,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log','-B']
+				,{}
+				);
+	return child;
 }
