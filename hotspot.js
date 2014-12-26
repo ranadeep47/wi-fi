@@ -96,14 +96,15 @@ var stop = exports.stop = function(iface,cb){
 	var kill_hostpad = 'pkill -9 hostapd 2>&1';
 
 	//kill dnsmasq
-	var stop_dnsmasq = 'service dnsmasq stop 2>&1'
-
+	var stop_dnsmasq = 'service dnsmasq stop 2>&1';
+	var kill_wpasupplicat = 'pkill wpa_supplicant';
+	var ifup 		= 'ifconfig '+iface+' up'
 	// iptables rule remove
 	var iptableRuleRemove = 'iptables -D POSTROUTING -t nat -o '+iface+' -j MASQUERADE 2>&1',
 		removeIPV4Forward = 'sysctl net.ipv4.ip_forward=0 2>&1';
 
 	exec(
-	stop_hostapd + " && " +  kill_hostpad + " && " + stop_dnsmasq + " && " + iptableRuleRemove + " && " + removeIPV4Forward
+	stop_hostapd + " && " + kill_hostpad + " && " + kill_wpasupplicat+ " && " + ifup + " && " + stop_dnsmasq + " && " + iptableRuleRemove + " && " + removeIPV4Forward
 	,cb);
 
 /*	//ifconfig interface down and up

@@ -76,13 +76,15 @@ Wifi.prototype.enable = function(interface,cb){
 	else if (this.interface != interface) this.iface(interface);
 
 	cmd = 'ifconfig '+this.interface+' up';
-	exec(cmd,function(err,sout,serr){
-		if(err) {
-			cb(err,null);
-			return;
-		}
-		cb(null,true)
-	})
+	setTimeout(function(){
+		exec(cmd,function(err,sout,serr){
+			if(err) {
+				cb(err,null);
+				return;
+			}
+			cb(null,true)
+		})
+	},200)
 }
 
 Wifi.prototype.disalbe = function(interface,cb){
@@ -108,13 +110,15 @@ Wifi.prototype.scan = function(cb){
 	if(!cb) throw new Error('Callback needed');
 	var accessPoints,
 		result;
-	exec('iw dev wlan0 scan',function(err,sout,serr){
-		if(err) cb(err,null)
-		else {
-			accessPoints 	= sout.split(/\nBSS/);
-			cb(null,parse_ssid_list(accessPoints));
-		}
-	})
+		this.disconnect(function(){
+			exec('iw dev wlan0 scan',function(err,sout,serr){
+				if(err) cb(err,null)
+				else {
+					accessPoints 	= sout.split(/\nBSS/);
+					cb(null,parse_ssid_list(accessPoints));
+				}
+			})
+		})
 }
 
 Wifi.prototype.connect = function(ssid,passphrase,cb){
@@ -152,7 +156,7 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 									//TODO : Remove from wpa_supplicant
 									cb(new Error('Wrong passcode'))
 								}
-						},5000)
+						},7000)
 						ctx.current.unref();
 
 
@@ -202,22 +206,26 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 
 Wifi.prototype.disconnect = function(cb){
 	var ctx = this;
-	exec('killall wpa_supplicant',function(err,sout,serr){
-		if(err) {
-			if(err.message.search('no process found') > -1) {
-				exec('iw dev '+ctx.interface+ ' disconnect',function(err,sout,serr){
-					if(err) {
-						//TODO
+	exec('pkill hostapd',function(){
+		ctx.enable(function(){
+			exec('killall wpa_supplicant',function(err,sout,serr){
+				if(err) {
+					if(err.message.search('no process found') > -1) {
+						exec('iw dev '+ctx.interface+ ' disconnect',function(err,sout,serr){
+							if(err) {
+								//TODO
+							}
+							cb(null,true);
+						})
 					}
-					cb(null,true);
-				})
-			}
-			else cb(serr,null);
-		}
-		else {
-			setTimeout(function(){ ctx.enable(cb);}, 200)
-			ctx.current = null;
-		}
+					else cb(serr,null);
+				}
+				else {
+					setTimeout(function(){ ctx.enable(cb);}, 200)
+					ctx.current = null;
+				}
+			})
+		})
 	})
 }
 
@@ -263,7 +271,7 @@ function isConnected(str){
 
 function wpa_connect(ctx){
 	var child = spawn('wpa_supplicant'
-				,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log','-B']
+				,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log']
 				,{}
 				);
 	return child;
