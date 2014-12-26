@@ -1,4 +1,4 @@
-var Wifi = require('./index');
+var Wifi = require('../index');
 
 var wifi = new Wifi();
 

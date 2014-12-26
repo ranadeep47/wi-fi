@@ -75,7 +75,7 @@ Wifi.prototype.enable = function(interface,cb){
 	if(!cb) cb = interface;
 	else if (this.interface != interface) this.iface(interface);
 
-	cmd = 'ifconfig '+this.interface+' up';
+	cmd = 'ifconfig '+this.interface+' down && ifconfig '+this.interface + ' up';
 	setTimeout(function(){
 		exec(cmd,function(err,sout,serr){
 			if(err) {
@@ -155,7 +155,7 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 									//TODO : Remove from wpa_supplicant
 									cb(new Error('Wrong passcode'))
 								}
-						},7000)
+						},10000)
 						ctx.current.unref();
 
 
@@ -205,7 +205,8 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 
 Wifi.prototype.disconnect = function(cb){
 	var ctx = this;
-	exec('pkill hostapd',function(){
+	exec('pkill -9 hostapd',function(){
+		console.log('huu')
 		ctx.enable(function(){
 			exec('killall wpa_supplicant',function(err,sout,serr){
 				if(err) {
@@ -220,7 +221,7 @@ Wifi.prototype.disconnect = function(cb){
 					else cb(serr,null);
 				}
 				else {
-					setTimeout(function(){ ctx.enable(cb);}, 200)
+					ctx.enable(cb);
 					ctx.current = null;
 				}
 			})
@@ -268,13 +269,13 @@ Wifi.prototype.hotspot = function(ssid,passphrase,iface,cb){
 
 
 function isConnected(str){
-	if(str.search('CTRL-EVENT-DISCONNECTED') > -1) return false;
-	else if (str.search('CTRL-EVENT-CONNECTED') > -1) return true;
+	if (str.search('CTRL-EVENT-CONNECTED') > -1) return true;
+	else if (str.search('CTRL-EVENT-DISCONNECTED') > -1) return false;
 }
 
 function wpa_connect(ctx){
 	var child = spawn('wpa_supplicant'
-				,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log']
+				,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log','-B']
 				,{}
 				);
 	return child;

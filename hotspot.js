@@ -98,11 +98,11 @@ var stop = exports.stop = function(iface,cb){
 	rmf(DNSMASQ_CONF);
 	//Kill hostapd
 	var stop_hostapd = 'service hostapd stop'
-	var kill_hostpad = 'killall -9 hostapd';
+	var kill_hostpad = 'pkill -9 hostapd';
 
 	//kill dnsmasq
 	var stop_dnsmasq = 'service dnsmasq stop';
-	var kill_wpasupplicat = 'killall -9 wpa_supplicant';
+	var kill_wpasupplicat = 'pkill -9 wpa_supplicant';
 	// iptables rule remove
 	var iptableRuleRemove = 'iptables -D POSTROUTING -t nat -o '+iface+' -j MASQUERADE 2>&1',
 		removeIPV4Forward = 'sysctl net.ipv4.ip_forward=0 2>&1';
