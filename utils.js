@@ -23,8 +23,23 @@ exports.update_dhclient = function(interface,cb){
 	})
 }
 
-
 exports.update_wpa_supplicant = function(ssid,passphrase,cb){
+	try{
+		fs.unlinkSync(WPA_SUPPLICANT);
+	}catch(e){
+		//File doesnt exist, let the appendFile in the bottom create the file
+	}
+	if(passphrase.length < 8) return cb(new Error('Passphrase should be min of 8 chars'), null);
+	generate_supplicant(ssid,passphrase,function(err,network){	
+		fs.appendFile(WPA_SUPPLICANT,network,function(err){
+			if(err) cb(err,false);
+			else cb(null,true)
+		})
+	})
+}
+
+
+/*exports.update_wpa_supplicant = function(ssid,passphrase,cb){
 	var NETWORK_REGEX = /network=\{([^}])+\}/g,
 		update_needed = false;
 
@@ -85,7 +100,7 @@ exports.update_wpa_supplicant = function(ssid,passphrase,cb){
 	})
 }
 
-
+*/
 function generate_supplicant(ssid,passphrase,cb){
 	ssid = ssid.trim();
 	passphrase = passphrase.trim();

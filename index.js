@@ -143,7 +143,6 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 						setTimeout(function(){
 							var stdoutlog = fs.readFileSync('./out.log','utf8');
 							if(isConnected(stdoutlog)) {
-									//run wpa_supplicant again
 									//Extract mac , run dhclient
 									update_dhclient(interface,function(err,updated){
 										if(!err && updated) {
@@ -259,7 +258,11 @@ Wifi.prototype.status = function(interface,cb){
 
 Wifi.prototype.hotspot = function(ssid,passphrase,iface,cb){
 		//Invote the ap-hotspot functionality
-		if(!iface) iface = 'wlan0';
+
+		if(!cb) {
+			cb = iface;
+			iface = 'wlan0';
+		}
 		hotspot.start(ssid,passphrase,iface,cb);
 }
 

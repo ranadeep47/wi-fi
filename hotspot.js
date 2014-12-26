@@ -72,14 +72,19 @@ var start = exports.start = function(ssid,passphrase,iface,cb){
 
 				//Enable sysctl ipv4 forward 
 				//Iptable rule
-				var IPV4Forward = 'sysctl net.ipv4.ip_forward=1 2>&1',
-					iptableRule = 'iptables -t nat -A POSTROUTING -o '+iface+' -j MASQUERADE 2>&1'
+				var IPV4Forward = 'sysctl net.ipv4.ip_forward=1',
+					iptableRule = 'iptables -t nat -A POSTROUTING -o '+iface+' -j MASQUERADE '
 
 				//Run hostapd -B config
-				var run_hostapd = 'nohup hostapd -B '+HOSTAPD_CONF // add log file TODO
-				exec(start_dnsmasq+ ' && ' +IPV4Forward + ' && ' + iptableRule+ ' && ' +run_hostapd,function(err,sout,serr){
-					if(serr) cb(serr,false)
-					else cb(null,true)
+				var run_hostapd = 'hostapd -B '+HOSTAPD_CONF // add log file TODO
+
+				exec('ifconfig '+iface+' 192.168.150.1',function(){
+					exec(start_dnsmasq,function(){
+						exec(IPV4Forward + ' && ' + iptableRule+ ' && ' +run_hostapd,function(err,sout,serr){
+							if(serr) cb(serr,false)
+							else cb(null,true)
+						})
+					});
 				});
 			}
 		});
@@ -93,18 +98,17 @@ var stop = exports.stop = function(iface,cb){
 	rmf(DNSMASQ_CONF);
 	//Kill hostapd
 	var stop_hostapd = 'service hostapd stop'
-	var kill_hostpad = 'pkill -9 hostapd 2>&1';
+	var kill_hostpad = 'killall -9 hostapd';
 
 	//kill dnsmasq
-	var stop_dnsmasq = 'service dnsmasq stop 2>&1';
-	var kill_wpasupplicat = 'pkill wpa_supplicant';
-	var ifup 		= 'ifconfig '+iface+' up'
+	var stop_dnsmasq = 'service dnsmasq stop';
+	var kill_wpasupplicat = 'killall -9 wpa_supplicant';
 	// iptables rule remove
 	var iptableRuleRemove = 'iptables -D POSTROUTING -t nat -o '+iface+' -j MASQUERADE 2>&1',
 		removeIPV4Forward = 'sysctl net.ipv4.ip_forward=0 2>&1';
 
 	exec(
-	stop_hostapd + " && " + kill_hostpad + " && " + kill_wpasupplicat+ " && " + ifup + " && " + stop_dnsmasq + " && " + iptableRuleRemove + " && " + removeIPV4Forward
+	kill_hostpad + " && " + kill_wpasupplicat+ " && " + stop_dnsmasq + " && " + iptableRuleRemove + " && " + removeIPV4Forward
 	,cb);
 
 /*	//ifconfig interface down and up
