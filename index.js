@@ -274,7 +274,6 @@ function isConnected(str){
 
 function wpa_connect(ctx){
 	var args = ["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log','-B']
-	console.log(args)
 	var child = spawn('wpa_supplicant'
 				,args
 				,{}
