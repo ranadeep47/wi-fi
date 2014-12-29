@@ -42,7 +42,7 @@ var hotspot = require('./hotspot');
 function Wifi(options){
 	var options = extend({}, options);
 	this.interface = options.interface || 'wlan0';
-	this.driver    = options.driver || 'wext';
+	this.driver    = options.driver || 'nl80211';
 	this.current   = null;
 
 	this.status(function(err,conn){
@@ -206,7 +206,6 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 Wifi.prototype.disconnect = function(cb){
 	var ctx = this;
 	exec('pkill -9 hostapd',function(){
-		console.log('huu')
 		ctx.enable(function(){
 			exec('killall wpa_supplicant',function(err,sout,serr){
 				if(err) {
@@ -274,8 +273,10 @@ function isConnected(str){
 }
 
 function wpa_connect(ctx){
+	var args = ["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log','-B']
+	console.log(args)
 	var child = spawn('wpa_supplicant'
-				,["-D"+ctx.driver, "-i"+ctx.interface,"-c"+WPA_SUPPLICANT,'-fout.log','-B']
+				,args
 				,{}
 				);
 	return child;
