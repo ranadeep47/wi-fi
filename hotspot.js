@@ -78,7 +78,7 @@ var start = exports.start = function(ssid,passphrase,iface,cb){
 				//Run hostapd -B config
 				var run_hostapd = 'hostapd -B '+HOSTAPD_CONF // add log file TODO
 
-				exec('ifconfig '+iface+' 192.168.150.1',function(){
+				exec('ifconfig '+iface+' 192.168.150.1 && pkill -9 dhclient',function(){
 					exec(start_dnsmasq,function(){
 						exec(IPV4Forward + ' && ' + iptableRule+ ' && ' +run_hostapd,function(err,sout,serr){
 							if(serr) cb(serr,false)
