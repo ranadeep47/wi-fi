@@ -257,8 +257,8 @@ Wifi.prototype.status = function(interface,cb){
 
 Wifi.prototype.ip = function(iface,cb){
 	if(!cb) {
-		iface = 'wlan0'
 		cb = iface;
+		iface = 'wlan0'
 	}
 
 	var cmd = 'ip -f inet addr | grep '+iface+' | grep inet'
