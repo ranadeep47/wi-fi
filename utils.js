@@ -1,4 +1,5 @@
 var MAC_REGEX 		= exports.MAC_REGEX 		= /([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})/;
+var IP_REGEX 		= exports.IP_REGEX 			= /(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)){3}/;
 var WPA_SUPPLICANT 	= exports.WPA_SUPPLICANT 	= '/etc/wpa_supplicant/wpa_supplicant.conf';
 
 var exec = require('child_process').exec,

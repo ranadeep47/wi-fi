@@ -35,6 +35,7 @@ var utils = require('./utils'),
 	parse_ssid_list 		= utils.parse_ssid_list,
 	parse_link_status		= utils.parse_link_status,
 	MAC_REGEX 				= utils.MAC_REGEX,
+	IP_REGEX 				= utils.IP_REGEX,
 	WPA_SUPPLICANT 			= utils.WPA_SUPPLICANT;
 
 var hotspot = require('./hotspot');
@@ -110,14 +111,12 @@ Wifi.prototype.scan = function(cb){
 	if(!cb) throw new Error('Callback needed');
 	var accessPoints,
 		result;
-		this.disconnect(function(){
-			exec('iw dev wlan0 scan',function(err,sout,serr){
-				if(err) cb(err,null)
-				else {
-					accessPoints 	= sout.split(/\nBSS/);
-					cb(null,parse_ssid_list(accessPoints));
-				}
-			})
+		exec('iw dev wlan0 scan',function(err,sout,serr){
+			if(err) cb(err,null)
+			else {
+				accessPoints 	= sout.split(/\nBSS/);
+				cb(null,parse_ssid_list(accessPoints));
+			}
 		})
 }
 
@@ -150,9 +149,6 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 									}
 									else cb(err,null)
 								})
-								 
-								//Truncate the out.log file
-								fs.truncateSync()
 							}
 							else {
 								//TODO : Remove from wpa_supplicant
@@ -258,6 +254,24 @@ Wifi.prototype.status = function(interface,cb){
 		}
 	})
 }
+
+Wifi.prototype.ip = function(iface,cb){
+	if(!cb) {
+		iface = 'wlan0'
+		cb = iface;
+	}
+
+	var cmd = 'ip -f inet addr | grep '+iface+' | grep inet'
+	exec(cmd,function(err,sout,serr){
+		if(err) cb(serr);
+		else {
+			var ip = sout.trim().split(' ')[1];
+			ip = IP_REGEX.exec(ip)[0]
+			cb(null,ip)
+		}
+	})
+}
+
 
 Wifi.prototype.hotspot = function(ssid,passphrase,iface,cb){
 		//Invote the ap-hotspot functionality
