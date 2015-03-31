@@ -142,7 +142,7 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 						ctx.current = wpa_connect(ctx);
 						setTimeout(function(){
 							var stdoutlog = fs.readFileSync('./out.log','utf8');
-							if(isConnected(stdoutlog)) {
+							if(!hasWrongPasscode(stdoutlog)) {
 									//Extract mac , run dhclient
 									update_dhclient(interface,function(err,updated){
 										if(!err && updated) {
@@ -151,11 +151,11 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 										else cb(err,null)
 									})
 								}
-								else {
-									//TODO : Remove from wpa_supplicant
-									cb(new Error('Wrong passcode'))
-								}
-						},10000)
+							else {
+								//TODO : Remove from wpa_supplicant
+								cb(new Error('Wrong passcode'))
+							}
+						},8000)
 						ctx.current.unref();
 
 
@@ -266,10 +266,9 @@ Wifi.prototype.hotspot = function(ssid,passphrase,iface,cb){
 		hotspot.start(ssid,passphrase,iface,cb);
 }
 
-
-function isConnected(str){
-	if (str.search('CTRL-EVENT-CONNECTED') > -1) return true;
-	else if (str.search('CTRL-EVENT-DISCONNECTED') > -1) return false;
+function hasWrongPasscode(str){
+	if( str.search('4-Way Handshake failed - pre-shared key may be incorrect') > -1) return true;
+	else return false;
 }
 
 function wpa_connect(ctx){
