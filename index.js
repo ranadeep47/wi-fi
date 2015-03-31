@@ -143,14 +143,17 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 						setTimeout(function(){
 							var stdoutlog = fs.readFileSync('./out.log','utf8');
 							if(!hasWrongPasscode(stdoutlog)) {
-									//Extract mac , run dhclient
-									update_dhclient(interface,function(err,updated){
-										if(!err && updated) {
-											ctx.status(interface,cb);
-										}
-										else cb(err,null)
-									})
-								}
+								//Extract mac , run dhclient
+								update_dhclient(interface,function(err,updated){
+									if(!err && updated) {
+										ctx.status(interface,cb);
+									}
+									else cb(err,null)
+								})
+								 
+								//Truncate the out.log file
+								fs.truncateSync()
+							}
 							else {
 								//TODO : Remove from wpa_supplicant
 								cb(new Error('Wrong passcode'))
