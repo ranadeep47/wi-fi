@@ -155,7 +155,7 @@ Wifi.prototype.connect = function(ssid,passphrase,cb){
 								//TODO : Remove from wpa_supplicant
 								cb(new Error('Wrong passcode'))
 							}
-						},8000)
+						},10000)
 						ctx.current.unref();
 
 
